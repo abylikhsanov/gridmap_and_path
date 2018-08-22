@@ -20,8 +20,8 @@ def main(image_filename, image_grids=10):
 
 	image = cv2.imread(image_filename)
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-	plt.imshow(image)
-	plt.show()
+	#plt.imshow(image)
+	#plt.show()
 	(winH, winW) = (int(image.shape[0]/image_grids), int(image.shape[1]/image_grids))
 
 	index = [1,1] # Robot starting point, FIXED
@@ -46,8 +46,8 @@ def main(image_filename, image_grids=10):
 		if(average_color[2] > 230 and average_color[1] < 190):
 			maze[index[1]-1][index[0]-1] = 1
 			occupied_grids.append(tuple(index))
-			plt.imshow(image_clone)
-			plt.show()
+			#plt.imshow(image_clone)
+			#plt.show()
 		if(any(i <= 20 for i in average_color)):
 			obstacles.append(tuple(index))
 
@@ -69,9 +69,13 @@ def main(image_filename, image_grids=10):
 
 	result = astar.a_star(maze, (start_point[0]-1,start_point[1]-1),(end_point[0]-1,end_point[1]-1))
 	print(result)
+	image_clone = image.copy()
 	for (x,y) in result: # Visualize the path
-		image_clone = image.copy()
-		cv2.rectangle(image_clone, (x,y), (x+))
+		x_start = x*winW
+		y_start = y*winH
+		cv2.rectangle(image_clone, (x_start,y_start), (x_start+winW, y_start+winH), (255,0,0), 2)
+	plt.imshow(image_clone)
+	plt.show()
 
 if __name__ == "__main__":
 
