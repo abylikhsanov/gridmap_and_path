@@ -1,10 +1,10 @@
-def a_star(m,start,end, grid_size):
-	w,h = grid_size
+def a_star(m,start,end, grid_size=10):
+	w,h = grid_size, grid_size
 	sx,sy = start
 	ex,ey = end
 
 	node = [None, sx,sy,0,abs(ex-sx), abs(ey-sy)]
-	closeList = [node]
+	closedList = [node]
 	createdList = {}
 	createdList[sy*w+sx] = node
 	k=0
@@ -24,13 +24,13 @@ def a_star(m,start,end, grid_size):
 			if nx == ex and ny == ey:
 				path = [(ex,ey)]
 				while node:
-					path.append(node[1],node[2])
+					path.append((node[1],node[2]))
 					node = node[0]
 				return list(reversed(path))
 			if 0<=nx<w and 0<=ny<h and m[ny][nx] == 0:
 				if ny*w+nx not in createdList:
 					nn = (node, nx, ny, 1, 1+abs(nx-ex)+abs(ny-ey))
-					createdList[ny*w+nx] == nn
+					createdList[ny*w+nx] = nn
 					nni = len(closedList)
 					closedList.append(nn)
 					while nni:

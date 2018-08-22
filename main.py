@@ -16,6 +16,7 @@ def main(image_filename, image_grids=10):
 
 	occupied_grids = []
 	planned_path = {}
+	obstacles = []
 
 	image = cv2.imread(image_filename)
 	(winH, winW) = (int(image.shape[0]/image_grids), int(image.shape[1]/image_grids))
@@ -23,9 +24,8 @@ def main(image_filename, image_grids=10):
 	index = [1,1] # Robot starting point, FIXED
 
 	blank_image = np.zeros((winW,winH,3), np.uint8)
-	list_images = [[blank_image for i in range(winW) for i in range(winH)]] # Creates winWxwinH
-	print(len(list_images))
-	maze = [[0 for i in range(winW) for i in range(winH)]]
+	list_images = [[blank_image for i in range(image_grids)] for i in range(image_grids)] # Creates winWxwinH
+	maze = [[0 for i in range(image_grids)] for i in range(image_grids)]
 
 	for(x,y, window) in sliding_window(image, windowSize=(winH, winW)):
 
@@ -60,15 +60,15 @@ def main(image_filename, image_grids=10):
 	start_point = points[0]
 	end_point = points[-1]
 
-	result = astar.a_star(maze, (start_point[0]-1,start_image[1]-1),(end_point[0]-1,end_point[1]-1))
+	result = astar.a_star(maze, (start_point[0]-1,start_point[1]-1),(end_point[0]-1,end_point[1]-1))
 
 if __name__ == "__main__":
 
 	image_name = "test_image1.jpg"
 	main(image_name)
 
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
+	#cv2.waitKey(0)
+	#v2.destroyAllWindows()
 
 
 
