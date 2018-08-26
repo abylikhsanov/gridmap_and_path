@@ -10,7 +10,6 @@ def sliding_window(image, windowSize):
 	step_size = windowSize[1]
 	for y in range(0,image.shape[0],windowSize[0]):
 		for x in range(0, image.shape[1], windowSize[1]):
-			print(x,y)
 			yield (x,y,image[y:y+windowSize[0], x:x+windowSize[1]])
 
 def main(image_filename, image_grids=20):
@@ -35,14 +34,14 @@ def main(image_filename, image_grids=20):
 
 		image_clone = image.copy()
 		cv2.rectangle(image_clone, (x,y), (x+winW, y+winH), (255,0,0), 2)
-		cropped_image = image_clone[x:x+winW, y:y+winH]
+		cropped_image = image_clone[y:y+winH, x:x+winW]
 		list_images[index[0]-1][index[1]-1] = cropped_image.copy()
 		average_color_row = np.average(cropped_image, axis=0)
 		average_color = np.average(average_color_row, axis=0)
 		average_color = np.uint8(average_color)
 
-		#print(index, average_color)
-
+		print(index, average_color_row[1])
+		
 		if(average_color[2] > 230 and average_color[1] < 190):
 			maze[index[1]-1][index[0]-1] = 1
 			occupied_grids.append(tuple(index))
@@ -58,7 +57,7 @@ def main(image_filename, image_grids=20):
 		#time.sleep(0.025)
 
 		index[1] += 1
-		if(index[1] > int(image.shape[1]/image_grids)):
+		if(index[1] > image_grids):
 			index[0] += 1
 			index[1] = 1
 
