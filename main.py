@@ -20,10 +20,11 @@ def main(image_filename, image_grids=60):
 
 	image = cv2.imread(image_filename)
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+	image = cv2.resize(image, (1200,1200))
 	#plt.imshow(image)
 	#plt.show()
 	(winH, winW) = (int(image.shape[0]/image_grids), int(image.shape[1]/image_grids))
-
+	print(winH,winW)
 	index = [1,1] # Robot starting point, FIXED
 
 	blank_image = np.zeros((winW,winH,3), np.uint8)
@@ -42,19 +43,20 @@ def main(image_filename, image_grids=60):
 
 		
 		if(average_color[2] > average_color[1] and average_color[2] > average_color[0]):
-			print("Occupied")
-			print(index)
-			print(x,y)
+			#print("Occupied")
+			#print(index)
+			#print(x,y)
 			occupied_grids.append(tuple(index))
-			plt.imshow(image_clone, interpolation='bicubic')
-			plt.xticks([])
-			plt.yticks([])
-			plt.show()
+			#plt.imshow(image_clone, interpolation='bicubic')
+			#plt.xticks([])
+			#plt.yticks([])
+			#plt.show()
+
+			'''  Index at [5,41] -> [832, 80] and [6,42] -> [858,100]   '''
 		  	
 		elif(average_color[1] < 225 and average_color[2] < 225):
-			maze[index[0]-1][index[1]-1] = 1
+			maze[index[1]-1][index[0]-1] = 1
 			obstacles.append(tuple(index))
-			#
 		
 		#time.sleep(0.025)
 
@@ -71,7 +73,7 @@ def main(image_filename, image_grids=60):
 
 	start_point = points[0]
 	end_point = points[-1]
-	print(start_point, end_point)
+	#print(start_point, end_point)
 	#image_clone = image.copy()
 	#nx = start_point[1]*winW
 	#ny = start_point[0]*winH
@@ -82,12 +84,15 @@ def main(image_filename, image_grids=60):
 
 
 	result = astar.a_star(maze, (start_point[0]-1,start_point[1]-1),(end_point[0]-1,end_point[1]-1), image_grids)
+	print(obstacles) # SOMETHING is wrong!! A star takes obstacles
 	print(result)
 	image_clone = image.copy()
-	for (y,x) in result: # Visualize the path
-		y_start = x*20
-		x_start = y*16
-		cv2.rectangle(image_clone, (x_start,y_start), (x_start+winW, y_start+winH), (255,0,0), 2)
+	for (x,y) in result: # Visualize the path
+		y_start = y*winH  # [5,41] -> 5 * 20 = 100
+		x_start = x*winW
+		cv2.rectangle(image_clone, (y_start,x_start), (y_start+winW, x_start+winH), (255,0,0), 2)
+		#plt.imshow(image_clone)
+		#plt.show()
 	plt.imshow(image_clone)
 	plt.show()
 
