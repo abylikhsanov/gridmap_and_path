@@ -1,8 +1,7 @@
-def a_star(m,start,end, grid_size=10):
+def a_star(m,start,end, grid_size):
 	w,h = grid_size, grid_size
 	sx,sy = start
 	ex,ey = end
-
 	node = [None, sx,sy,0,abs(ex-sx), abs(ey-sy)]
 	closedList = [node]
 	createdList = {}
@@ -17,6 +16,7 @@ def a_star(m,start,end, grid_size=10):
 
 		if k != 0:
 			neighbours = ((x,y+1),(x,y-1),(x+1,y),(x-1,y))
+
 		else:
 			neighbours = ((x+1,y),(x-1,y),(x,y+1),(x,y-1))
 

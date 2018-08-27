@@ -12,7 +12,7 @@ def sliding_window(image, windowSize):
 		for x in range(0, image.shape[1], windowSize[1]):
 			yield (x,y,image[y:y+windowSize[0], x:x+windowSize[1]])
 
-def main(image_filename, image_grids=20):
+def main(image_filename, image_grids=60):
 
 	occupied_grids = []
 	planned_path = {}
@@ -33,45 +33,60 @@ def main(image_filename, image_grids=20):
 	for(x,y, window) in sliding_window(image, windowSize=(winH, winW)):
 
 		image_clone = image.copy()
-		cv2.rectangle(image_clone, (x,y), (x+winW, y+winH), (255,0,0), 2)
+		cv2.rectangle(image_clone, (x,y), (x+winW, y+winH), (255,255,255), 2)
 		cropped_image = image_clone[y:y+winH, x:x+winW]
 		list_images[index[0]-1][index[1]-1] = cropped_image.copy()
 		average_color_row = np.average(cropped_image, axis=0)
 		average_color = np.average(average_color_row, axis=0)
-		average_color = np.uint8(average_color)
+		#average_color = np.uint8(average_color)
 
-		print(index, average_color_row[1])
 		
-		if(average_color[2] > 230 and average_color[1] < 190):
-			maze[index[1]-1][index[0]-1] = 1
+		if(average_color[2] > average_color[1] and average_color[2] > average_color[0]):
+			print("Occupied")
+			print(index)
+			print(x,y)
 			occupied_grids.append(tuple(index))
-			print("Occupied grid")
-		if(any(i <= 20 for i in average_color)):
+			plt.imshow(image_clone, interpolation='bicubic')
+			plt.xticks([])
+			plt.yticks([])
+			plt.show()
+		  	
+		elif(average_color[1] < 225 and average_color[2] < 225):
+			maze[index[0]-1][index[1]-1] = 1
 			obstacles.append(tuple(index))
-			print("Obstacle!")
-
-		plt.imshow(image_clone, cmap='gray', interpolation='bicubic')
-		plt.xticks([])
-		plt.yticks([])
-		plt.show()
+			#
+		
 		#time.sleep(0.025)
+
 
 		index[1] += 1
 		if(index[1] > image_grids):
 			index[0] += 1
 			index[1] = 1
 
-	points = [i for i in occupied_grids if i not in obstacles]
+		if(index[0] > image_grids):
+			break
+
+	points = [i for i in occupied_grids]
 
 	start_point = points[0]
 	end_point = points[-1]
+	print(start_point, end_point)
+	#image_clone = image.copy()
+	#nx = start_point[1]*winW
+	#ny = start_point[0]*winH
+	#cv2.rectangle(image_clone, (nx,ny), (nx+winW, ny+winH), (244,0,0), 2)
+	#plt.imshow(image_clone)
+	#plt.show()
 
-	result = astar.a_star(maze, (start_point[0]-1,start_point[1]-1),(end_point[0]-1,end_point[1]-1))
+
+
+	result = astar.a_star(maze, (start_point[0]-1,start_point[1]-1),(end_point[0]-1,end_point[1]-1), image_grids)
 	print(result)
 	image_clone = image.copy()
-	for (x,y) in result: # Visualize the path
-		x_start = x*winW
-		y_start = y*winH
+	for (y,x) in result: # Visualize the path
+		y_start = x*20
+		x_start = y*16
 		cv2.rectangle(image_clone, (x_start,y_start), (x_start+winW, y_start+winH), (255,0,0), 2)
 	plt.imshow(image_clone)
 	plt.show()
