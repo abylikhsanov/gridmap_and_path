@@ -1,11 +1,30 @@
+
+class Node:
+
+	def __init__(self, sx,sy,ex,ey):
+		self.sx = sx
+		self.sy = sy
+		self.eucl_distace = abs(ex-sx)+abs(ey-sy)
+		self.g = 0
+		self.parent_node = None
+
+	def give_data(self):
+		return [self.parent_node, self.sx, self.sy, self.g, self.eucl_distance]
+
+
 def a_star(m,start,end, grid_size):
 	w,h = grid_size, grid_size
 	sx,sy = start
 	ex,ey = end
-	node = [None, sx,sy,0,abs(ex-sx), abs(ey-sy)]
-	closedList = [node]
+	Node node(sx,sy,ex,ey)
+	closedList = [node.give_data()]
 	createdList = {}
-	createdList[sy*w+sx] = node
+	createdList[sy*w+sx] = node.give_data()
+
+	#node = [None, sx,sy,0,abs(ex-sx), abs(ey-sy)]
+	#closedList = [node]
+	#createdList = {}
+	#createdList[sy*w+sx] = node
 	k=0
 	while(closedList):
 		node = closedList.pop(0)
