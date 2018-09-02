@@ -20,7 +20,30 @@ class Node:
 		return abs(self.sx-self.ex)+abs(self.sy-self.ey)
 
 	def successors(self, w, h):
-		if (self.sx != 0 and self.sy != 0)
+		''' Check for all 4 corners first '''
+		if self.sx == 0 and self.sy == 0: # Bottom left corner
+			return [(self.sy+1,self.sx),(self.sy+1,self.sx+1), (self.sy,self.sx+1)]
+		elif self.sx == w-1 and self.sy == h-1: # Top right corner
+			return [(self.sy, self.sx-1), (self.sy-1, self.sx-1), (self.sy-1, self.sx)]
+		elif self.sx == 0 and self.sy == h-1: # Top left corner
+			return [(self.sy, self.sx+1), (self.sy-1,self.sx+1), (self.sy-1,self.sx)]
+		elif self.sx == w-1 and self.sy == 0: # Bottom right corner
+			return [(self.sy, self.sx-1), (self.sy+1, self.sx-1), (self.sy+1,self.sx)]
+
+		''' Check the edge columns and rows, without worrying about the corners '''
+		elif self.sx == 0: # Left edge
+			return [(self.sy+1,self.sx), (self.sy+1,self.sx+1), (self.sy,self.sx+1), (self.sy-1,self.sx+1), (self.sy-1,self.sx)]
+		elif self.sy == 0: # Bottom edge
+			return [(self.sy,self.sx-1), (self.sy+1, self.sx-1), (self.sy+1,self.sx), (self.sy+1, self.sx+1), (self.sy,self.sx+1)]
+		elif self.sx == w-1: # Right edge
+			return [(self.sy-1, self.sx), (self.sy-1, self.sx-1), (self.sy, self.sx-1), (self.sy+1,self.sx-1), (self.sy+1,self.sx)]
+		elif self.sy == h-1: # Top edge
+			return [(self.sy, self.sx-1), (self.sy-1, self.sx-1), (self.sy-1, self.sx), (self.sy-1, self.sx+1), (self.sy, self.sx+1)]
+
+		''' Now everything else inbetween '''
+	    else:
+	    	return [(self.sy, self.sx-1),(self.sy+1, self.sx-1),(self.sy+1, self.sx),(self.sy+1, self.sx+1),(self.sy, self.sx+1),(self.sy-1, self.sx+1),(self.sy-1, self.sx),(self.sy-1, self.sx-1)]
+
 		
 
 
