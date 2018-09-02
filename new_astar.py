@@ -19,8 +19,8 @@ class Node:
 	def goal_distance(self):
 		return abs(self.sx-self.ex)+abs(self.sy-self.ey)
 
-	def successors(self):
-		points = []
+	def successors(self, w, h):
+		if (self.sx != 0 and self.sy != 0)
 		
 
 
@@ -46,6 +46,9 @@ def a_star(map, start, end, grid_size):
 				path.append((node_current.sy, node_current.sx))
 				node_current = node_current.prev_node
 			return list(reversed(path))
+		else:
+			for successor in node_current.successors(w,h):
+				
 
 
 
