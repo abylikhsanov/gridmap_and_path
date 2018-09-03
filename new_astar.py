@@ -1,79 +1,104 @@
-
+import math
 
 class Node:
 
-	def __init__(self, sx, sy, ex, ey, Node):
-		self.sx = sx
-		self.sy = sy
-		self.ex = ex
-		self.ey = ey
+	def __init__(self, y, x, Node):
+		self.y = y
+		self.x = x
 		self.prev_node = Node
+		self.g = 0
+		self.h = 0
+		self.f = 0
 
-	def heuristic(self):
-		dx = abs(self.sx - self.ex)
-		dy = abs(self.sy - self.ey)
+	def heuristic(self, ey, ex):
+		dx = abs(self.x - ex)
+		dy = abs(self.y - ey)
 		D = 1
-		D_2 = sqrt(2)
+		D_2 = math.sqrt(2)
 		return D * (dx+dy) + (D_2 - 2*D) * min(dx,dy)
 
-	def goal_distance(self):
-		return abs(self.sx-self.ex)+abs(self.sy-self.ey)
+	def goal_distance(self, ey, ex):
+		return abs(self.x-ex)+abs(self.y-ey)
 
-	def successors(self, w, h):
-		''' Check for all 4 corners first '''
-		if self.sx == 0 and self.sy == 0: # Bottom left corner
-			return [(self.sy+1,self.sx),(self.sy+1,self.sx+1), (self.sy,self.sx+1)]
-		elif self.sx == w-1 and self.sy == h-1: # Top right corner
-			return [(self.sy, self.sx-1), (self.sy-1, self.sx-1), (self.sy-1, self.sx)]
-		elif self.sx == 0 and self.sy == h-1: # Top left corner
-			return [(self.sy, self.sx+1), (self.sy-1,self.sx+1), (self.sy-1,self.sx)]
-		elif self.sx == w-1 and self.sy == 0: # Bottom right corner
-			return [(self.sy, self.sx-1), (self.sy+1, self.sx-1), (self.sy+1,self.sx)]
-
-		''' Check the edge columns and rows, without worrying about the corners '''
-		elif self.sx == 0: # Left edge
-			return [(self.sy+1,self.sx), (self.sy+1,self.sx+1), (self.sy,self.sx+1), (self.sy-1,self.sx+1), (self.sy-1,self.sx)]
-		elif self.sy == 0: # Bottom edge
-			return [(self.sy,self.sx-1), (self.sy+1, self.sx-1), (self.sy+1,self.sx), (self.sy+1, self.sx+1), (self.sy,self.sx+1)]
-		elif self.sx == w-1: # Right edge
-			return [(self.sy-1, self.sx), (self.sy-1, self.sx-1), (self.sy, self.sx-1), (self.sy+1,self.sx-1), (self.sy+1,self.sx)]
-		elif self.sy == h-1: # Top edge
-			return [(self.sy, self.sx-1), (self.sy-1, self.sx-1), (self.sy-1, self.sx), (self.sy-1, self.sx+1), (self.sy, self.sx+1)]
-
-		''' Now everything else inbetween '''
-	    else:
-	    	return [(self.sy, self.sx-1),(self.sy+1, self.sx-1),(self.sy+1, self.sx),(self.sy+1, self.sx+1),(self.sy, self.sx+1),(self.sy-1, self.sx+1),(self.sy-1, self.sx),(self.sy-1, self.sx-1)]
-
-		
+	
 
 
 def a_star(map, start, end, grid_size):
 	w,h = grid_size, grid_size
 	sy,sx = start
 	ey,ex = end
-	node_start = Node(sx,sy,ex,ey,None)
+	node_start = Node(sy,sx,None)
+	node_start.g = node_start.goal_distance(ey,ex)
+	node_start.h = node_start.heuristic(ey,ex)
+	node_start.f = node_start.g+node_start.h
+	node_end = Node(ey,ex,None)
 	open_list = [node_start]
 	closed_list = []
-	node_current = node_start
-	index = 0
-	while open_list:
-		lowest_cost = open_list[0].goal_distance()+open_list[0].heuristic()
-		for node in open_list:
-			cost = node.goal_distance()+node.heuristic()
-			if lowest_cost <= cost:
-				lowest_cost = cost
+	lowest_cost = open_list[0].f
+
+	while len(open_list)>0:
+		current_index = 0
+		node_current = open_list[0]
+
+		for index, node in enumerate(open_list):
+			if node.f < node_current.f:
 				node_current = node
-		if node_current.sx = ex and node_current.sy = ey:
+				current_index = index
+
+		if node_current.x == ex and node_current.y == ey:
 			path = [(ey,ex)]
-			while node_current.prev_node != None:
-				path.append((node_current.sy, node_current.sx))
+			while node_current.prev_node is not None:
+				path.append((node_current.y, node_current.x))
 				node_current = node_current.prev_node
 			return list(reversed(path))
-		else:
-			for successor in node_current.successors(w,h):
-				
+
+		open_list.pop(current_index)
+		closed_list.append(node_current)
+		children = []
+		for (y,x) in [(0,-1),(0,1),(-1,0),(1,0),(-1,-1),(-1,1),(1,-1),(1,1)]:
+
+			# Getting coordinates of a current node successor
+			successor = (node_current.y + y, node_current.x + x)
+
+			# Checking that the move is legitimate:
+			if successor[0] > h-1 or successor[0] < 0 or successor[1] > w-1 or successor[1] < 0:
+				continue
+
+			# Also checking that the next move is not an obstacle:
+			if map[y][x] == 1:
+				continue
+
+			for closed_node in closed_list:
+				if closed_node.x == successor[1] and closed_node.y == successor[0]:
+					continue
+
+			for open_node in open_list:
+				if open_node.y == successor[0] and open_node.x == successor[1]:
+					continue
+			node_successor = Node(successor[0], successor[1], node_current)
+			node_successor.g = node_current.g+1
+			node_successor.h = node_successor.heuristic(ey,ex)
+			node_successor.f = node_successor.g+node_successor.h
+			open_list.append(node_successor)
 
 
+		'''	# Loop through chlidren (current node successors)
+		for child in children:
+			for closed_node in closed_list:
+				if child.y == closed_node.y and child.x == closed_node.x:
+					continue
 
+			child.g = node_current.g + 1
+			child.h = child.heuristic(ey,ex)
+			child.f - child.g+child.h
 
+				# Check if child is already in the open list
+			for open_node in open_list:
+				if (child.x == open_node.x and child.y == open_node.y) or child.g > open_node.g:
+
+					continue
+
+				# After exploring the child (successor) add it to the open list
+			open_list.append(child) '''
+	return []
 

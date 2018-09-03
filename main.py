@@ -4,7 +4,7 @@ import time
 import matplotlib.pyplot as plt
 
 
-import astar
+import new_astar
 
 def sliding_window(image, windowSize):
 	step_size = windowSize[1]
@@ -12,7 +12,7 @@ def sliding_window(image, windowSize):
 		for x in range(0, image.shape[1], windowSize[1]):
 			yield (x,y,image[y:y+windowSize[0], x:x+windowSize[1]])
 
-def main(image_filename, image_grids=60):
+def main(image_filename, image_grids=20):
 
 	occupied_grids = []
 	planned_path = {}
@@ -55,8 +55,9 @@ def main(image_filename, image_grids=60):
 			'''  Index at [5,41] -> [832, 80] and [6,42] -> [858,100]   '''
 		  	
 		elif(average_color[1] < 225 and average_color[2] < 225):
-			maze[index[1]-1][index[0]-1] = 1
+			maze[index[0]-1][index[1]-1] = 1
 			obstacles.append(tuple(index))
+			
 		
 		#time.sleep(0.025)
 
@@ -83,9 +84,11 @@ def main(image_filename, image_grids=60):
 
 
 
-	result = astar.a_star(maze, (start_point[0]-1,start_point[1]-1),(end_point[0]-1,end_point[1]-1), image_grids)
+	result = new_astar.a_star(maze, (start_point[0]-1,start_point[1]-1),(end_point[0]-1,end_point[1]-1), image_grids)
 	print(obstacles) # SOMETHING is wrong!! A star takes obstacles
+	print("RESULT: ")
 	print(result)
+	print(start_point, end_point)
 	image_clone = image.copy()
 	for (x,y) in result: # Visualize the path
 		y_start = y*winH  # [5,41] -> 5 * 20 = 100
